@@ -1,10 +1,12 @@
-import React, { useMemo } from "react";
-import { FlatList, Image, View } from "react-native";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import { ActivityIndicator, Alert, FlatList, Image, View } from "react-native";
 import { useTheme } from "@react-navigation/native";
 import Icon, { IconType } from "react-native-dynamic-vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as NavigationService from "react-navigation-helpers";
 import RNBounceable from "@freakycoder/react-native-bounceable";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { concat, flatMap } from "lodash";
+import Reactotron from "reactotron-react-native";
 /**
  * ? Local Imports
  */
@@ -17,84 +19,106 @@ import CardItem from "./components/card-item/CardItem";
 import { SCREENS } from "@shared-constants";
 import Text from "@shared-components/text-wrapper/TextWrapper";
 import fonts from "@fonts";
-
-const profileURI =
-  // eslint-disable-next-line max-len
-  "https://images.unsplash.com/photo-1544568100-847a948585b9?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2574&q=80";
+import appApi from "@api";
+import { AppEventsWithChildren } from "@services/models";
+import { resolveAppEvents } from "@utils";
+import Activity from "./components/activity/Activity";
 
 interface HomeScreenProps {}
 
 const HomeScreen: React.FC<HomeScreenProps> = () => {
   const theme = useTheme();
+  const [events, setEvents] = useState<AppEventsWithChildren[]>([]);
+  const [checkedEvents, setCheckedEvents] = useState<number[]>([]);
   const { colors } = theme;
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const {
+    data,
+    isError,
+    fetchNextPage,
+    isFetchingNextPage,
+    hasNextPage,
+    isFetching: loading,
+    error,
+  } = useInfiniteQuery(
+    ["fetch-events"],
+    async ({ pageParam = 1 }) => {
+      const res = await appApi.fetchEvents(pageParam, 25);
+      if (res.code === 200) {
+        return res.data!.data;
+      } else {
+        throw res;
+      }
+    },
+    {
+      getNextPageParam: (_lastPage, allPages) => {
+        // console.log(name, _lastPage)
+        if (_lastPage.events && _lastPage.events.length > 0) {
+          return allPages.length + 1;
+        }
+        return undefined;
+      },
+      staleTime: Infinity,
+    },
+  );
 
-  const handleItemPress = () => {
-    NavigationService.push(SCREENS.DETAIL);
+  useEffect(() => {
+    if (data) {
+      const _events = resolveAppEvents(flatMap(data.pages, (d) => d.events));
+      Reactotron.log!(_events);
+      setEvents(_events);
+    }
+  }, [data]);
+  useEffect(() => {
+    if (isError && error) Alert.alert("Error", "Something went wrong");
+  }, [isError, error]);
+
+  const handleItemPress = (index: number) => {
+    setCheckedEvents((c) => {
+      if (c.includes(index)) {
+        return c.filter((i) => i !== index);
+      }
+
+      return concat(c, index);
+    });
   };
 
   /* -------------------------------------------------------------------------- */
   /*                               Render Methods                               */
   /* -------------------------------------------------------------------------- */
 
-  const MenuButton = () => (
-    <RNBounceable>
-      <Icon
-        name="menu"
-        type={IconType.Ionicons}
-        color={colors.iconBlack}
-        size={30}
-      />
-    </RNBounceable>
-  );
-
-  const Header = () => (
-    <View style={styles.header}>
-      <MenuButton />
-      <Image
-        resizeMode="cover"
-        source={{ uri: profileURI }}
-        style={styles.profilePicImageStyle}
-      />
-    </View>
-  );
-
-  const List = () => (
+  const List = (
     <View style={styles.listContainer}>
       <FlatList
-        data={MockData}
-        renderItem={({ item }) => (
-          <CardItem data={item} onPress={handleItemPress} />
+        data={events}
+        keyExtractor={(_, index) => `activity${index}`}
+        renderItem={({ item, index }) => (
+          <Activity
+            activity={item}
+            checked={checkedEvents.includes(index)}
+            onPressCheck={() => handleItemPress(index)}
+          />
         )}
       />
     </View>
   );
-
-  const Welcome = () => (
-    <>
-      <Text h1 bold color={colors.text}>
-        Hello Kuray
-      </Text>
-      <Text
-        fontFamily={fonts.montserrat.lightItalic}
-        color={colors.placeholder}
-      >
-        Welcome Back
-      </Text>
-    </>
+  const Loading = (
+    <View style={styles.listContainer}>
+      <ActivityIndicator />
+    </View>
   );
 
-  const Content = () => (
+  const Content = (
     <View style={styles.contentContainer}>
-      <Welcome />
-      <List />
+      {loading && Loading}
+      {List}
     </View>
   );
 
   return (
     <SafeAreaView style={styles.container}>
-      <Header />
-      <Content />
+      {Content}
+      <View></View>
     </SafeAreaView>
   );
 };
