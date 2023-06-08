@@ -31,7 +31,7 @@
       "@shared-components/*": ["./shared/components/*"],
       "@shared-constants": ["./shared/constants"],
       "@font-size": ["./shared/theme/font-size"],
-      "@api": ["./services/api/index"],
+      "@api": ["./services/api"],
       "@fonts": ["./shared/theme/fonts"],
       "@colors": ["./shared/theme/colors"],
       "@theme/*": ["./shared/theme/*"],

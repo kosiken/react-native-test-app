@@ -9,6 +9,9 @@ import Navigation from "./src/navigation";
 import { isAndroid } from "@freakycoder/react-native-helpers";
 
 LogBox.ignoreAllLogs();
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const client = new QueryClient();
 
 const App = () => {
   const scheme = useColorScheme();
@@ -27,9 +30,9 @@ const App = () => {
   }, [scheme, isDarkMode]);
 
   return (
-    <>
+    <QueryClientProvider client={client}>
       <Navigation />
-    </>
+    </QueryClientProvider>
   );
 };
 

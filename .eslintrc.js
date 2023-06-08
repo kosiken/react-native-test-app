@@ -58,6 +58,7 @@ module.exports = {
     },
   },
   rules: {
+    'no-console': 'error',
     quotes: [
       "error",
       "double",
