@@ -6,11 +6,13 @@ import Icon, { IconType } from "react-native-dynamic-vector-icons";
 const CheckBox: React.FC<{
   checked?: boolean;
   onChange?: (c: boolean) => void;
-}> = ({ checked, onChange }) => {
+  disabled?: boolean;
+}> = ({ checked, onChange, disabled = false }) => {
   const theme = useTheme();
 
   return (
     <TouchableOpacity
+      disabled={disabled}
       onPress={() => {
         if (onChange) {
           onChange(!checked);

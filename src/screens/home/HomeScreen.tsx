@@ -20,7 +20,7 @@ import Text from "@shared-components/text-wrapper/TextWrapper";
 import appApi from "@api";
 import { AppEventsWithChildren } from "@services/models";
 import { resolveAppEvents } from "@utils";
-import Activity from "./components/events/Events";
+import Event from "./components/events/Events";
 import Spacer from "@shared-components/spacer/Spacer";
 
 interface HomeScreenProps {}
@@ -42,7 +42,7 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
   } = useInfiniteQuery(
     ["fetch-events"],
     async ({ pageParam = 1 }) => {
-      const res = await appApi.fetchEvents(pageParam, 5);
+      const res = await appApi.fetchEvents(pageParam, 6);
       if (res.code === 200) {
         return res.data!.data;
       } else {
@@ -89,7 +89,7 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
 
   const Loading = (
     <View style={styles.loadingContainer}>
-      <ActivityIndicator />
+      <ActivityIndicator color={colors.primary} />
     </View>
   );
 
@@ -104,7 +104,7 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
           data={events}
           keyExtractor={(_, index) => `activity${index}`}
           renderItem={({ item, index }) => (
-            <Activity
+            <Event
               activity={item}
               onPressCheck={() => handleItemPress(index)}
             />

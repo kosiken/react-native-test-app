@@ -16,7 +16,7 @@ export default (theme: ExtendedTheme) => {
     },
     bottomNext: {
       flexDirection: "row",
-      padding: 10,
+      padding: 15,
     },
     loadingContainer: {
       alignItems: "center",

@@ -12,43 +12,36 @@ import Spacer from "@shared-components/spacer/Spacer";
 import { fromNow } from "utils";
 import { ScrollView } from "react-native-gesture-handler";
 import CheckBox from "@shared-components/checkbox/CheckBox";
+import RNBounceable from "@freakycoder/react-native-bounceable";
 
 type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
-interface IActivityProps {
+interface IEventProps {
   activity: Optional<AppEventsWithChildren, "children">;
 }
 
-type ActivitySubProps = IActivityProps & { theme: any; styles: EventStyle };
-const StatusUpdate: React.FC<ActivitySubProps> = ({
-  activity,
-  theme,
-  styles,
-}) => {
+type EventSubProps = IEventProps & { theme: any; styles: EventStyle };
+const StatusUpdate: React.FC<EventSubProps> = ({ activity, theme, styles }) => {
   const ActivityCircle = <View style={styles.activityCircle} />;
   return (
     <>
-      <Spacer spacing={1} direction="horizontal" />
+      <Spacer spacing={2} direction="horizontal" />
       <Text style={styles.text}>
         has {startCase(activity.activity?.type || "")} to
       </Text>
-      <Spacer spacing={1} direction="horizontal" />
+      <Spacer spacing={2} direction="horizontal" />
       {ActivityCircle}
-      <Spacer spacing={1} direction="horizontal" />
+      <Spacer spacing={2} direction="horizontal" />
       <Text style={styles.text} color={theme.colors.text}>
         {activity.activity?.status}
       </Text>
-      <Spacer spacing={1} direction="horizontal" />
+      <Spacer spacing={3.5} direction="horizontal" />
       <Text style={styles.smallText}>{fromNow(activity.createdAt)}</Text>
       <Spacer spacing={1} direction="horizontal" />
     </>
   );
 };
 
-const MessageBox: React.FC<ActivitySubProps> = ({
-  theme,
-  activity,
-  styles,
-}) => {
+const MessageBox: React.FC<EventSubProps> = ({ theme, activity, styles }) => {
   return (
     <View style={styles.messageBox}>
       <Text color={theme.colors.text}>
@@ -71,8 +64,8 @@ const MessageBox: React.FC<ActivitySubProps> = ({
     </View>
   );
 };
-const Activity: React.FC<
-  IActivityProps & {
+const Event: React.FC<
+  IEventProps & {
     isChild?: boolean;
     onPressCheck?: (c: boolean) => void;
   }
@@ -92,7 +85,7 @@ const Activity: React.FC<
       return (
         <>
           {activity.children.map((a) => (
-            <Activity activity={a} key={a.createdAt} isChild />
+            <Event activity={a} key={a.createdAt} isChild />
           ))}
         </>
       );
@@ -104,40 +97,44 @@ const Activity: React.FC<
     if (activity.type === "activity" && !isChild) {
       return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.activityRow}>
-            <CheckBox onChange={onPress} checked={checked} />
-            <Spacer spacing={3} direction="horizontal" />
-            <UserAvatar
-              size={30}
-              name={activity.author}
-              bgColor={colors.secondary}
-            />
-            <Spacer spacing={2} direction="horizontal" />
-            <Text style={styles.text} color={colors.text}>
-              {activity.author}
-            </Text>
+          <RNBounceable onPress={() => onPress(!checked)}>
+            <View style={styles.activityRow}>
+              <CheckBox disabled checked={checked} />
+              <Spacer spacing={3} direction="horizontal" />
+              <UserAvatar
+                size={30}
+                name={activity.author}
+                bgColor={colors.secondary}
+              />
+              <Spacer spacing={2} direction="horizontal" />
+              <Text style={styles.text} color={colors.text}>
+                {activity.author}
+              </Text>
 
-            <StatusUpdate activity={activity} theme={theme} styles={styles} />
-          </View>
+              <StatusUpdate activity={activity} theme={theme} styles={styles} />
+            </View>
+          </RNBounceable>
         </ScrollView>
       );
     } else if (activity.type === "comment" && !isChild) {
       return (
         <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <View style={styles.activityRow}>
-            {!isChild && <CheckBox onChange={onPress} checked={checked} />}
-            {isChild && <Spacer spacing={20} direction="horizontal" />}
-            <Spacer spacing={3} direction="horizontal" />
-            <UserAvatar
-              size={30}
-              name={activity.author}
-              bgColor={colors.primary}
-            />
-            <Spacer spacing={2} direction="horizontal" />
-            <Text style={styles.text} color={colors.text}>
-              {activity.author}
-            </Text>
-          </View>
+          <RNBounceable onPress={() => onPress(!checked)}>
+            <View style={styles.activityRow}>
+              {!isChild && <CheckBox disabled checked={checked} />}
+              {isChild && <Spacer spacing={20} direction="horizontal" />}
+              <Spacer spacing={3} direction="horizontal" />
+              <UserAvatar
+                size={30}
+                name={activity.author}
+                bgColor={colors.primary}
+              />
+              <Spacer spacing={2} direction="horizontal" />
+              <Text style={styles.text} color={colors.text}>
+                {activity.author}
+              </Text>
+            </View>
+          </RNBounceable>
         </ScrollView>
       );
     } else if (activity.type === "activity") {
@@ -161,6 +158,7 @@ const Activity: React.FC<
   return (
     <View style={[styles.container, isChild && styles.childBox]}>
       {renderHeader()}
+
       {activity.type === "comment" && (
         <MessageBox styles={styles} theme={theme} activity={activity} />
       )}
@@ -169,4 +167,4 @@ const Activity: React.FC<
   );
 };
 
-export default Activity;
+export default Event;

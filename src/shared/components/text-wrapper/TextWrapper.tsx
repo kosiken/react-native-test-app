@@ -13,7 +13,7 @@ interface ITextWrapperProps extends IRNTextProps {
 
 const TextWrapper: React.FC<ITextWrapperProps> = ({
   fontFamily = fonts.inter.regular,
-  color = "#757575",
+  color = "#8F7893",
   children,
   ...rest
 }) => {
