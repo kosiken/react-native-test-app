@@ -19,7 +19,6 @@ export default (theme: ExtendedTheme) => {
       padding: 10,
     },
     loadingContainer: {
-      flexDirection: "row",
       alignItems: "center",
     },
   });
