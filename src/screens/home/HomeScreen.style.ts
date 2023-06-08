@@ -56,6 +56,7 @@ export default (theme: ExtendedTheme) => {
     },
     listContainer: {
       marginTop: 8,
+      backgroundColor: colors.dynamicBackground,
     },
     profilePicImageStyle: {
       height: 50,
