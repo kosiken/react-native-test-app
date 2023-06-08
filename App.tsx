@@ -8,7 +8,7 @@ import SplashScreen from "react-native-splash-screen";
 import Navigation from "./src/navigation";
 import { isAndroid } from "@freakycoder/react-native-helpers";
 
-// LogBox.ignoreAllLogs();
+LogBox.ignoreAllLogs();
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const client = new QueryClient();

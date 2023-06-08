@@ -151,7 +151,7 @@ abstract class ApiBase {
       body?: TBody,
       fail = false,
     ) => {
-      // tslint:disable-next-line: no-console
+      // eslint-disable-next-line no-console
       console.log(
         `${method} ${url} body => ${JSON.stringify(body)}`,
         params,

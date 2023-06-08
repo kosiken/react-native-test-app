@@ -97,6 +97,7 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
   const remaining = _last?.remaining || 0;
   return (
     <SafeAreaView style={styles.container}>
+      <Spacer spacing={2} />
       {loading && Loading}
       <View style={styles.container}>
         <FlatList
@@ -118,7 +119,7 @@ const HomeScreen: React.FC<HomeScreenProps> = () => {
             {remaining > 0 ? `Show ${remaining} more events` : "All done"}
           </Text>
           <Spacer spacing={5} direction="horizontal" />
-          {isFetchingNextPage && <ActivityIndicator />}
+          {isFetchingNextPage && <ActivityIndicator color={colors.primary} />}
         </View>
       </TouchableOpacity>
     </SafeAreaView>

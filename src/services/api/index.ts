@@ -9,9 +9,7 @@ const events = (data as AppEvents[]).sort(
 );
 
 class AppApi extends ApiBase {
-  public resetAppState() {
-    console.log("reset");
-  }
+  public resetAppState() {}
   private static _instance: AppApi;
   public fetchEvents(page: number, limit = 5) {
     const nextIndex = (page - 1) * limit;
